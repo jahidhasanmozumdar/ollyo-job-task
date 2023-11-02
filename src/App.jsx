@@ -109,7 +109,7 @@ function App() {
           <h4 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">{`Selected Items: ${selectedImages.length}`}</h4>
         </div>
         <div>
-          <h3>Gallery</h3>
+          <h3 className="text-[20px] font-bold">Gallery</h3>
         </div>
         <button
           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
