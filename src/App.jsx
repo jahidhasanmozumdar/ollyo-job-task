@@ -30,15 +30,16 @@ function App() {
   };
 
   const handleFirstImageClick = () => {
-    if (selectedImages.includes(imageList[0])) {
+    const firstImage = imageList[0];
+    if (selectedImages.includes(firstImage)) {
       setSelectedImages(
-        selectedImages.filter((selected) => selected !== imageList[0])
+        selectedImages.filter((selected) => selected !== firstImage)
       );
     } else {
-      setSelectedImages([imageList[0], ...selectedImages]);
+      setSelectedImages([firstImage, ...selectedImages]);
     }
   };
-
+  //Image delete function
   const handleDeleteImages = () => {
     const filteredImages = imageList.filter(
       (image) => !selectedImages.includes(image)
@@ -47,6 +48,7 @@ function App() {
     setSelectedImages([]);
   };
 
+  //Drag And drop function
   const handleDragStart = (e, id) => {
     e.dataTransfer.setData("text/plain", id);
   };
@@ -74,6 +76,32 @@ function App() {
     setImageList(updatedImageList);
   };
 
+  const handleTouchStart = (e, id) => {
+    e.dataTransfer.setData("text/plain", id);
+  };
+
+  const handleTouchMove = (e) => {
+    e.preventDefault();
+  };
+
+  const handleTouchEnd = (e, id) => {
+    const draggedId = e.dataTransfer.getData("text/plain");
+    const draggedImage = imageList.find(
+      (image) => image.id === parseInt(draggedId, 10)
+    );
+    const droppedImage = imageList.find(
+      (image) => image.id === parseInt(id, 10)
+    );
+
+    const draggedImageIndex = imageList.indexOf(draggedImage);
+    const droppedImageIndex = imageList.indexOf(droppedImage);
+
+    const updatedImageList = [...imageList];
+    updatedImageList[draggedImageIndex] = droppedImage;
+    updatedImageList[droppedImageIndex] = draggedImage;
+
+    setImageList(updatedImageList);
+  };
   return (
     <div className="container mx-auto p-4 bg-white">
       <div className="mb-4 flex flex-col sm:flex-row justify-between items-center">
@@ -83,11 +111,14 @@ function App() {
         <div>
           <h3>Gallery</h3>
         </div>
-        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onClick={handleDeleteImages}>
+        <button
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+          onClick={handleDeleteImages}
+        >
           Delete Item
         </button>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 ">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 ">
         <div
           className="row-span-2 col-span-2 border text-center image-container"
           onClick={handleFirstImageClick}
@@ -95,20 +126,25 @@ function App() {
           onDragStart={(e) => handleDragStart(e, imageList[0].id)}
           onDragOver={(e) => handleDragOver(e)}
           onDrop={(e) => handleDrop(e, imageList[0].id)}
+          onTouchStart={(e) => handleTouchStart(e, imageList[0].id)}
+          onTouchMove={(e) => handleTouchMove(e)}
+          onTouchEnd={(e) => handleTouchEnd(e, imageList[0].id)}
         >
           <img
             src={imageList[0].src}
             alt={`Image ${imageList[0].id}`}
             className="w-full h-auto"
           />
-          <div className="overlay absolute">
-            <input
-              type="checkbox"
-              className="m-2 relative bottom-[450px]"
-              checked={selectedImages.includes(imageList[0])}
-              onChange={handleFirstImageClick}
-            />
-          </div>
+          {selectedImages.includes(imageList[0]) && (
+            <div className="overlay absolute">
+              <input
+                type="checkbox"
+                className="m-2 relative bottom-[270px] sm:bottom-[280px] md:bottom-[410px] lg:bottom-[450px]"
+                checked={selectedImages.includes(imageList[0])}
+                onChange={handleFirstImageClick}
+              />
+            </div>
+          )}
         </div>
         {imageList.slice(1).map((image) => (
           <div
@@ -125,14 +161,16 @@ function App() {
               alt={`Image ${image.id}`}
               className="w-full h-auto border"
             />
-            <div className="overlay absolute">
-              <input
-                type="checkbox"
-                className="m-2 relative bottom-[220px]"
-                checked={selectedImages.includes(image)}
-                onChange={() => handleImageClick(image)}
-              />
-            </div>
+            {selectedImages.includes(image) && (
+              <div className="overlay absolute">
+                <input
+                  type="checkbox"
+                  className="m-2 relative bottom-[130px] sm:bottom-[130px] md:bottom-[190px]"
+                  checked={selectedImages.includes(image)}
+                  onChange={() => handleImageClick(image)}
+                />
+              </div>
+            )}
           </div>
         ))}
         <div className="image-container add-image border flex justify-center items-center">
